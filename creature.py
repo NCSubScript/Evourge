@@ -58,8 +58,10 @@ class Creature:
         display.blit(surface, self.location, special_flags=pygame.BLEND_RGBA_ADD)
     
     def genLocation(self):
-        self.location = [random.randint(200, self.app.gui.window.children["field"].width-200), \
-                         random.randint(200, self.app.gui.window.children["field"].height-200)]
+        w = self.app.gui.window.children["field"].width
+        h = self.app.gui.window.children["field"].height
+        self.location = [random.randint(int(w*0.1), w-int(w*0.1)), \
+                         random.randint(int(h*0.1), h-int(h*0.1))]
     
     def move(self):
         self.location[0] += random.randint(-2, 2)

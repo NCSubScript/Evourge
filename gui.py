@@ -120,7 +120,7 @@ class Field():
     def render(self, display):
         self.surface = self.surface.convert_alpha()
         self.surface.fill(self.getBgColor())
-        self.surface.blit(self.background.image, (0,0))
+        self.surface.blit(self.background.image, (0,0), special_flags=pygame.BLEND_RGBA_ADD)
         self.app.creatures.render(self.surface)
         display.blit(self.surface, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
 
@@ -164,6 +164,7 @@ class GUI():
     def updateDisplay(self):
         self.display = pygame.display.set_mode(self.window.getSize(), self.surfaceOptions, self.colorDepth, self.screenId, self.vsync)
         self.window.children["field"].setSize(self.window.getSize())
+        self.window.children["field"].background.render()
 
     def initPygame(self):
         if not self.muted:
@@ -172,7 +173,7 @@ class GUI():
         pygame.display.init()
         pygame.font.init()
         self.updateDisplay()
-        self.window.children["field"].background.render()
+        
         
     def setSurfaceOptions(self, options):
         if isinstance(options, str):
@@ -196,7 +197,6 @@ class GUI():
         if event.type == pygame.VIDEORESIZE:
             self.window.setSize(event.w, event.h)
             self.updateDisplay()
-            self.window.children["field"].background.update()
             self.app.repositionCreatures()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:

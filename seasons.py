@@ -14,7 +14,7 @@ class Cycles:
         self.hour = 0
         self.rStep, self.bStep, self.gStep = [0, 0, 0]
         self.skyColor = [0, 0, 0]
-        self.hourLength = 30
+        self.hourLength = 6
 
         self.loadSky()
         
