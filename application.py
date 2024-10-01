@@ -1,20 +1,17 @@
 from gui import GUI
 from seasons import Cycles
-from creature import Creature
+from creature import Creatures
 import math
 class App():
     def __init__(self) -> None:
         self.gui = GUI(self)
         self.cycles = None
-        self.creatures = []
-        self.maxCreatures = int(math.sqrt(self.gui.window.width * self.gui.window.height) / 2)
+        self.creatures = Creatures(self)
 
     def run(self) -> None:
         self.gui.initPygame()
         self.cycles = Cycles(self.gui.window.children["field"])
-        
-        for i in range(self.maxCreatures):
-            self.creatures.append(Creature(self))
+        self.creatures.generate()
 
 
         self._running = True
@@ -27,8 +24,7 @@ class App():
 
     def loop(self):
         self.cycles.changeColors()
-        for creature in self.creatures:
-            creature.move()
+        self.creatures.move()
 
 
     def running(self):
@@ -44,5 +40,4 @@ class App():
         self._running = False
 
     def repositionCreatures(self):
-        for creature in self.creatures:
-            creature.genLocation()
+        self.creatures.genLocation()

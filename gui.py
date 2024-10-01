@@ -92,12 +92,18 @@ class Background():
 
 
 class Field():
-    def __init__(self) -> None:
+    def __init__(self, app) -> None:
+        self.app = app
         self.width = 1027
         self.height = 768
         self.red = 255
         self.green = 255
         self.blue = 255
+
+        self.background = Background(self)
+
+        self.surface = pygame.Surface((self.width, self.height), pygame.HIDDEN, 32)
+        
 
     def updateBackgroundColor(self, color):
         self.red, self.green, self.blue = zip(list(color))
@@ -109,11 +115,22 @@ class Field():
         self.width = size[0]
         self.height = size[1]
 
+        self.surface = pygame.Surface((self.width, self.height), pygame.HIDDEN, 32)
+
+    def render(self, display):
+        self.surface = self.surface.convert_alpha()
+        self.surface.fill(self.getBgColor())
+        self.surface.blit(self.background.image, (0,0))
+        self.app.creatures.render(self.surface)
+        display.blit(self.surface, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
+
 class Window():
-    def __init__(self) -> None:
+    def __init__(self, app) -> None:
+        self.app = app
         self.width = 1027
         self.height = 768
         self.children = {}
+        self.children["field"] = Field(self.app)
 
     def getSize(self):
         return (self.width, self.height)
@@ -122,10 +139,17 @@ class Window():
         self.width = width
         self.height = height
 
+        for child in self.children.values():
+            child.setSize((width, height))
+
+    def render(self, display):
+        for child in self.children.values():
+            child.render(display)
+
 class GUI():
     def __init__(self, app) -> None:
         self.app = app
-        self.window = Window()
+        self.window = Window(self.app)
         self.surfaceOptions = pygame.HWSURFACE|pygame.DOUBLEBUF|pygame.RESIZABLE
         self.colorDepth = 32
         self.screenId = 0
@@ -133,8 +157,8 @@ class GUI():
         self.muted = 1
         self.display = None
         self.fps = 30
-        self.window.children["field"] = Field()
-        self.background = Background(self.window.children["field"])
+        
+        
         
 
     def updateDisplay(self):
@@ -148,7 +172,7 @@ class GUI():
         pygame.display.init()
         pygame.font.init()
         self.updateDisplay()
-        self.background.render()
+        self.window.children["field"].background.render()
         
     def setSurfaceOptions(self, options):
         if isinstance(options, str):
@@ -172,7 +196,7 @@ class GUI():
         if event.type == pygame.VIDEORESIZE:
             self.window.setSize(event.w, event.h)
             self.updateDisplay()
-            self.background.update()
+            self.window.children["field"].background.update()
             self.app.repositionCreatures()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
@@ -181,11 +205,8 @@ class GUI():
 
     def render(self):
         # print(f'{self.window.children["field"].getBgColor()=}')
-        self.display.fill(self.window.children["field"].getBgColor())
-        self.display.blit(self.background.image, (0,0))
-
-        for creature in self.app.creatures:
-            creature.render(self.display)
+        self.display.fill((0, 0, 0, 0))
+        self.window.render(self.display)
 
         pygame.display.flip()
         pygame.time.Clock().tick(self.fps)

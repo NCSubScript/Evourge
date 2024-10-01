@@ -2,28 +2,6 @@ import random
 import pygame
 import math
 
-class Creatures:
-    def __init__(self, app):
-        self.app = app
-        self.count = 50
-        self.data = []
-
-    def generate(self):
-        while len(self.data) < self.count:
-            self.data.append(Creature(self.app))
-
-    def render(self, display):
-        for creature in self.data:
-            creature.render(display)
-
-    def move(self):
-        for creature in self.data:
-            creature.move()
-
-    def genLocation(self):
-        for creature in self.data:
-            creature.genLocation()
-()
 class Creature:
     def __init__(self, app) -> None:
         self.app = app
@@ -44,6 +22,8 @@ class Creature:
 
         # display = display.convert_alpha()
         surface = pygame.Surface((size*2, size*2), pygame.HIDDEN, 32)
+        surface = surface.convert_alpha()
+        surface.fill((0, 0, 0, 255))
 
         while size > 2:
             # print(f'{color=} {location=} {size=} {rstep=} {gstep=} {bstep=}')
@@ -55,7 +35,7 @@ class Creature:
             color[1] = min(255, int(color[1] + gstep))
             color[2] = min(255, int(color[2] + bstep))
 
-        display.blit(surface, self.location, special_flags=pygame.BLEND_RGBA_ADD)
+        display.blit(surface, self.location, special_flags=pygame.BLEND_MAX)
     
     def genLocation(self):
         self.location = [random.randint(200, self.app.gui.window.children["field"].width-200), \
