@@ -1,6 +1,7 @@
 import random
 import pygame
 import math
+import time
 
 class Creatures:
     def __init__(self, app):
@@ -9,8 +10,12 @@ class Creatures:
         self.data = []
 
     def generate(self):
+        self.count = int(math.sqrt((self.app.gui.window.children["field"].width * self.app.gui.window.children["field"].width)) / 8)
         while len(self.data) < self.count:
             self.data.append(Creature(self.app))
+        
+        if self.count and len(self.data) > self.count:
+            del self.data[self.count:]
 
     def render(self, display):
         for creature in self.data:
@@ -21,19 +26,23 @@ class Creatures:
             creature.move()
 
     def genLocation(self):
+        self.generate()
         for creature in self.data:
             creature.genLocation()
-()
+
 class Creature:
     def __init__(self, app) -> None:
         self.app = app
         self.location = None
+        self.size = random.randint(10, 45)
         self.genLocation()
         self.color = [random.randint(20, 50), random.randint(100, 150), random.randint(150, 200)]
-        self.size = random.randint(10, 45)
+        self.rect = None
+        self.lastMove = 0
+        self.mps = 10
+        self.draw()
 
-    def render(self, display):
-        
+    def draw(self):
         color = self.color.copy()
         size = self.size
         location = [size, size]
@@ -43,11 +52,11 @@ class Creature:
         bstep = (255 - color[2]) / math.floor(size / 2)
 
         # display = display.convert_alpha()
-        surface = pygame.Surface((size*2, size*2), pygame.HIDDEN, 32)
+        self.rect = pygame.Surface((size*2, size*2), pygame.HIDDEN, 32)
 
         while size > 2:
             # print(f'{color=} {location=} {size=} {rstep=} {gstep=} {bstep=}')
-            pygame.draw.circle(surface, tuple(color), location, size)
+            pygame.draw.circle(self.rect, tuple(color), location, size)
             size -= 2
             location[0] -= 1
             location[1] -= 1
@@ -55,17 +64,20 @@ class Creature:
             color[1] = min(255, int(color[1] + gstep))
             color[2] = min(255, int(color[2] + bstep))
 
-        display.blit(surface, self.location, special_flags=pygame.BLEND_RGBA_ADD)
+    def render(self, display):
+         display.blit(self.rect, (self.location[0] - self.size, self.location[1] - self.size), special_flags=pygame.BLEND_RGBA_ADD)
     
     def genLocation(self):
         w = self.app.gui.window.children["field"].width
         h = self.app.gui.window.children["field"].height
-        self.location = [random.randint(int(w*0.1), w-int(w*0.1)), \
-                         random.randint(int(h*0.1), h-int(h*0.1))]
+        self.location = [random.randint(int(self.size), int(w-self.size)), \
+                         random.randint(int(self.size), int(h-self.size))]
     
     def move(self):
-        self.location[0] += random.randint(-2, 2)
-        self.location[0] = min(self.app.gui.window.children["field"].width, max(0, self.location[0]))
-        self.location[1] += random.randint(-2, 2)
-        self.location[1] = min(self.app.gui.window.children["field"].height, max(0, self.location[1]))
+        if self.app.now - self.lastMove > ((1 / 60) * (60 / self.mps)):
+            self.location[0] += random.randint(-1, 1)
+            self.location[0] = min(self.app.gui.window.children["field"].width-self.size, max(self.size, (self.location[0])))
+            self.location[1] += random.randint(-1, 1)
+            self.location[1] = min(self.app.gui.window.children["field"].height-self.size, max(self.size, (self.location[1])))
+            self.lastMove = time.time()
         

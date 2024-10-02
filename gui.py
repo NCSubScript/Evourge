@@ -127,17 +127,36 @@ class Field():
 class Window():
     def __init__(self, app) -> None:
         self.app = app
-        self.width = 1027
-        self.height = 768
+        self.surfaceOptions = pygame.HWSURFACE|pygame.DOUBLEBUF|pygame.RESIZABLE
+        self.externalWidth = 640
+        self.externalHeight = 480
+        self.width = 640
+        self.height = 480
+        self.maxWidth = 640
+        self.maxHeight = 480
         self.children = {}
         self.children["field"] = Field(self.app)
 
-    def getSize(self):
-        return (self.width, self.height)
+    def getSize(self, scaled = True):
+        if scaled and self.getSurfaceOptions() & pygame.SCALED:
+            return (self.width, self.height)
+        
+        return (self.externalWidth, self.externalHeight)
     
     def setSize(self, width, height):
-        self.width = width
-        self.height = height
+        self.externalWidth = width
+        self.externalHeight = height
+
+        if self.externalWidth > self.maxWidth:
+            self.width = self.maxWidth
+        else:
+            self.width = self.externalWidth
+
+        if self.externalHeight > self.maxHeight:
+            self.height = self.maxHeight
+        else:
+            self.height = self.externalHeight
+        
 
         for child in self.children.values():
             child.setSize((width, height))
@@ -146,25 +165,39 @@ class Window():
         for child in self.children.values():
             child.render(display)
 
+    def getSurfaceOptions(self):
+        if (self.externalWidth > self.maxWidth) or (self.externalHeight > self.maxHeight):
+            return self.surfaceOptions # |pygame.SCALED
+        return self.surfaceOptions # & ~pygame.SCALED
+    
 class GUI():
     def __init__(self, app) -> None:
         self.app = app
         self.window = Window(self.app)
-        self.surfaceOptions = pygame.HWSURFACE|pygame.DOUBLEBUF|pygame.RESIZABLE
+        
         self.colorDepth = 32
         self.screenId = 0
+        self.activeDisplay = 0
         self.vsync = 1
         self.muted = 1
         self.display = None
-        self.fps = 30
+        self.fps = 60
+
         
         
         
 
     def updateDisplay(self):
-        self.display = pygame.display.set_mode(self.window.getSize(), self.surfaceOptions, self.colorDepth, self.screenId, self.vsync)
+        
+        if self.display is not None and self.window.getSurfaceOptions() != self.display.get_flags():
+            pygame.display.quit()
+            pygame.display.init()
+        self.display = pygame.display.set_mode(size=self.window.getSize(False), flags=self.window.getSurfaceOptions(), depth=self.colorDepth, display=self.screenId, vsync=self.vsync)
+        self.window.surfaceOptions = self.display.get_flags()
+        print(f'{self.window.getSize(False)=} {self.window.getSurfaceOptions()=} {self.window.surfaceOptions=} {self.display.get_flags()=} {self.window.getSurfaceOptions() & self.display.get_flags()} {self.display.get_flags()=}')
         self.window.children["field"].setSize(self.window.getSize())
         self.window.children["field"].background.render()
+        self.activeDisplay = self.screenId
 
     def initPygame(self):
         if not self.muted:
@@ -177,9 +210,9 @@ class GUI():
         
     def setSurfaceOptions(self, options):
         if isinstance(options, str):
-            self.surfaceOptions = eval(options)
+            self.window.surfaceOptions = eval(options)
         else:
-            self.surfaceOptions = options
+            self.window.surfaceOptions = options
 
     def close(self):
         pygame.quit()
@@ -194,6 +227,9 @@ class GUI():
     def onEvent(self, event):
         if event.type == pygame.QUIT:
             self.app.sigKill()
+        if event.type == pygame.WINDOWDISPLAYCHANGED:
+            self.screenId = int(event.display_index)
+            print(f'{self.screenId=}')
         if event.type == pygame.VIDEORESIZE:
             self.window.setSize(event.w, event.h)
             self.updateDisplay()
@@ -209,4 +245,4 @@ class GUI():
         self.window.render(self.display)
 
         pygame.display.flip()
-        pygame.time.Clock().tick(self.fps)
+        # pygame.time.Clock().tick(self.fps)
