@@ -7,3 +7,6 @@ __pycache__/seasons.cpython-312.pyc
 __pycache__/creature.cpython-312.pyc
 build/*
 dist/main/*
+__pycache__/application.cpython-312.pyc
+__pycache__/creature.cpython-312.pyc
+__pycache__/gui.cpython-312.pyc

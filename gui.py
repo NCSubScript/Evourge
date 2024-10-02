@@ -121,7 +121,7 @@ class Field():
         self.surface = self.surface.convert_alpha()
         self.surface.fill(self.getBgColor())
         self.surface.blit(self.background.image, (0,0), special_flags=pygame.BLEND_RGBA_ADD)
-        self.app.creatures.render(self.surface)
+        self.app.creatures.draw(self.surface)
         display.blit(self.surface, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
 
 class Window():
@@ -242,6 +242,7 @@ class GUI():
     def render(self):
         # print(f'{self.window.children["field"].getBgColor()=}')
         self.display.fill((0, 0, 0, 0))
+        self.app.cycles.changeColors()
         self.window.render(self.display)
 
         pygame.display.flip()

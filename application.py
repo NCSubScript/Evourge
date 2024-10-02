@@ -26,9 +26,7 @@ class App():
 
         while self._running:
             self.clockFrame()
-            if self.now > self.lastFrameTime + ((60 / self.gui.fps) / 60):
-                self.fdt = self.now - self.lastFrameTime
-                self.running()
+            self.running()
                 
 
 
@@ -46,16 +44,18 @@ class App():
         self.pnow = self.now
 
     def loop(self):
-        self.cycles.changeColors()
-        self.creatures.move()
+        self.gui.processEvents()
+        self.gui.processInputs()
+        self.creatures.update()
 
 
     def running(self):
-        self.lastFrameTime = time.time()
-        self.gui.processEvents()
-        self.gui.processInputs()
         self.loop()
-        self.gui.render()
+        if self.now > self.lastFrameTime + ((60 / self.gui.fps) / 60):
+            self.fdt = self.now - self.lastFrameTime
+            self.lastFrameTime = time.time()
+            
+            self.gui.render()
 
     def onExit(self) -> None:
         self.gui.close()
