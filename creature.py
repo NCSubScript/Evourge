@@ -11,7 +11,7 @@ class Creatures:
         self.sizes = {}
         self.lastMove = 0
         self.mag = 0
-        self.mps = 0.05
+        self.mps = 2
         self.sizeChanges = []
 
     def generate(self):
@@ -134,25 +134,40 @@ class Creature:
             color[2] = min(255, int(color[2] + bstep))
 
     def render(self, display):
-        for creature in self.app.creatures.sizes[self.size].values():
-            if creature.id != self.id:
-                if self.collusion(creature):
-                    # if not moved:
-                    if (self.moveToStep[0] < 0 and creature.moveToStep[0] > 0) or (self.moveToStep[0] > 0 and creature.moveToStep[0] < 0):
-                        self.moveToStep[0] *= -1
-                        creature.moveToStep[0] *= -1
-                    if (self.moveToStep[1] < 0 and creature.moveToStep[1] > 0) or (self.moveToStep[1] > 0 and creature.moveToStep[1] < 0):
-                        self.moveToStep[1] *= -1
-                        creature.moveToStep[1] *= -1
+        if self.size in self.app.creatures.sizes and len(self.app.creatures.sizes[self.size]) > 1:
+            for creature in self.app.creatures.sizes[self.size].values():
+                if creature.id != self.id:
+                    if self.collusion(creature):
+                        # if not moved:
+                        if (self.moveToStep[0] < 0 and creature.moveToStep[0] > 0) or (self.moveToStep[0] > 0 and creature.moveToStep[0] < 0):
+                            self.moveToStep[0] *= -1
+                            creature.moveToStep[0] *= -1
+                        if (self.moveToStep[1] < 0 and creature.moveToStep[1] > 0) or (self.moveToStep[1] > 0 and creature.moveToStep[1] < 0):
+                            self.moveToStep[1] *= -1
+                            creature.moveToStep[1] *= -1
 
-                    if self.size < self.maxSize[1]:
-                        self.app.creatures.sizeChanges.append({"from": self.size, "to": self.size+1, "id": self.id})
-                        self.size += 1
-                        self.draw()
-                    if creature.size > self.maxSize[0]:
-                        self.app.creatures.sizeChanges.append({"from": self.size, "to": self.size+1, "id": self.id})
-                        creature.size -= 1
-                        creature.draw()
+                        if self.size < self.maxSize[1]:
+                            alreadPoped = False
+                            if len(self.app.creatures.sizeChanges):
+                                for entry in self.app.creatures.sizeChanges:
+                                    if self.id == entry["id"]:
+                                        alreadPoped = True
+                                        break
+                            if not alreadPoped:
+                                self.app.creatures.sizeChanges.append({"from": self.size, "to": self.size+1, "id": self.id})
+                                self.size += 1
+                                self.draw()
+                        if creature.size > self.maxSize[0]:
+                            alreadPoped = False
+                            if len(self.app.creatures.sizeChanges):
+                                for entry in self.app.creatures.sizeChanges:
+                                    if creature.id == entry["id"]:
+                                        alreadPoped = True
+                                        break
+                            if not alreadPoped:
+                                self.app.creatures.sizeChanges.append({"from": creature.size, "to": creature.size-1, "id": creature.id})
+                                creature.size -= 1
+                                creature.draw()
                         
 
         if (self.moveToStep[0] > 0 and self.location[0] + self.moveToStep[0] < self.app.gui.window.children["field"].width - self.size) or (self.moveToStep[0] < 0 and self.location[0] + self.moveToStep[0] >= self.size):
