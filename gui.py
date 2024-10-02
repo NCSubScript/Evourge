@@ -18,7 +18,7 @@ class Background():
     def render(self):
         bgTile = pygame.Surface((56,math.ceil(32*0.866)),pygame.HIDDEN,24)
 
-        bgTileFill = pygame.Surface((math.ceil(bgTile.get_width()/2),math.ceil(bgTile.get_height() / 2)),pygame.HIDDEN,24)
+        bgTileFill = pygame.Surface((math.ceil(bgTile.get_width()/2),math.ceil(bgTile.get_height() / 2)),pygame.HIDDEN|pygame.SRCALPHA,32)
 
         buffer = pygame.PixelArray(bgTileFill)
 
@@ -94,8 +94,10 @@ class Background():
 class Field():
     def __init__(self, app) -> None:
         self.app = app
-        self.width = 1027
-        self.height = 768
+        self.width = 1000
+        self.height = 1000
+        self.maxWidth = 1000
+        self.maxHeight = 1000
         self.red = 255
         self.green = 255
         self.blue = 255
@@ -112,15 +114,15 @@ class Field():
         return (self.red, self.green, self.blue)
         
     def setSize(self, size):
-        self.width = size[0]
-        self.height = size[1]
+        self.width = min(size[0], self.maxWidth)
+        self.height = min(size[1], self.maxHeight)
 
         self.surface = pygame.Surface((self.width, self.height), pygame.HIDDEN, 32)
 
     def render(self, display):
         self.surface = self.surface.convert_alpha()
         self.surface.fill(self.getBgColor())
-        self.surface.blit(self.background.image, (0,0), special_flags=pygame.BLEND_RGBA_ADD)
+        self.surface.blit(self.background.image, (0,0))
         self.app.creatures.draw(self.surface)
         display.blit(self.surface, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
 
@@ -136,6 +138,7 @@ class Window():
         self.maxHeight = 480
         self.children = {}
         self.children["field"] = Field(self.app)
+        self.caption = "Evourge"
 
     def getSize(self, scaled = True):
         if scaled and self.getSurfaceOptions() & pygame.SCALED:
@@ -198,6 +201,8 @@ class GUI():
         self.window.children["field"].setSize(self.window.getSize())
         self.window.children["field"].background.render()
         self.activeDisplay = self.screenId
+        
+        pygame.display.set_caption(self.window.caption)
 
     def initPygame(self):
         if not self.muted:

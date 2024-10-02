@@ -113,9 +113,6 @@ class Creature(pygame.sprite.Sprite):
         self.location = list(self.rect.center).copy()
         self.moveTo = list(self.rect.center).copy()
         self.moveToStep = [0, 0]
-        self.undulation = bool(random.randint(0, 1))
-        self.undulationAmount = random.randint(92, 108) / 100
-        print(f'{self.undulationAmount=}')
 
 
     def deriv(self, a, b):
@@ -130,17 +127,15 @@ class Creature(pygame.sprite.Sprite):
 
     def renderSprite(self):
         color = self.color.copy()
-        color.append(32)
         size = self.radius
         location = [size+1, size+1]
 
         rstep = (240 - color[0]) / math.floor(size / 2)
         gstep = (240 - color[1]) / math.floor(size / 2)
         bstep = (240 - color[2]) / math.floor(size / 2)
-        astep = (240 - color[3]) / math.floor(size / 2)
 
         # display = display.convert_alpha()
-        self.image = pygame.Surface(((size*2) + 2, (size*2) + 2), pygame.HIDDEN|pygame.SRCALPHA , 32)
+        self.image = pygame.Surface(((size*2) + 2, (size*2) + 2), pygame.HIDDEN, 32)
 
         while size > 2:
             # print(f'{color=} {location=} {size=} {rstep=} {gstep=} {bstep=}')
@@ -151,12 +146,9 @@ class Creature(pygame.sprite.Sprite):
             color[0] = min(255, int(color[0] + rstep))
             color[1] = min(255, int(color[1] + gstep))
             color[2] = min(255, int(color[2] + bstep))
-            color[3] = min(255, int(color[3] + astep))
             
-        color = self.color.copy()
-        color.append(32)
-        pygame.gfxdraw.aacircle(self.image, self.radius+1, self.radius+1, self.radius, color)
-        pygame.gfxdraw.aacircle(self.image, self.radius+1, self.radius+1, self.radius-1, color)
+        pygame.gfxdraw.aacircle(self.image, self.radius+1, self.radius+1, self.radius, self.color)
+        pygame.gfxdraw.aacircle(self.image, self.radius+1, self.radius+1, self.radius-1, self.color)
         
         self.rect = self.image.get_rect()
         self.drawMask()
@@ -244,37 +236,11 @@ class Creature(pygame.sprite.Sprite):
         
         scaled_background = pygame.transform.scale_by(scaled_background, 1.35)
         scaled_background.set_colorkey((255,0,128))
-        
-        
-        
-        scaleBy = None
-        if self.undulation == True:
-            if self.undulationAmount > 1:
-                scaleBy = self.undulationAmount, 2 - self.undulationAmount
-            else:
-                scaleBy = 2 - self.undulationAmount, self.undulationAmount
-            if self.undulationAmount >= 1.12:
-                self.undulation = False
-        else:
-            if self.undulationAmount < 1:
-                scaleBy = 2 - self.undulationAmount, self.undulationAmount
-            else:
-                scaleBy = self.undulationAmount, 2 - self.undulationAmount
-            if self.undulationAmount <= 0.88:
-                self.undulation = True
-                
-        self.undulationAmount += 0.005 if self.undulation else -0.005
-        
-        scaled_background = pygame.transform.scale_by(scaled_background, list(scaleBy))
-        
-        scaled_image = self.image.copy()
-        scaled_image = pygame.transform.scale_by(scaled_image,  list(scaleBy))
-            
-        
-        
         display.blit(scaled_background, ((self.location[0]-self.radius*1.3)-3, (self.location[1]-self.radius*1.3)-3))
-      
-        display.blit(scaled_image, (math.floor(self.location[0]) - self.radius, math.floor(self.location[1]) - self.radius))
+        
+        
+        display.blit(self.image, (math.floor(self.location[0]) - self.radius, math.floor(self.location[1]) - self.radius), special_flags=pygame.BLEND_RGBA_ADD)
+    
     def genLocation(self):
         w = self.app.gui.window.children["field"].width
         h = self.app.gui.window.children["field"].height

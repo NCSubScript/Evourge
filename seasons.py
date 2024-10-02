@@ -31,7 +31,7 @@ class Cycles:
 
         return False
 
-    def changeColors(self, override = True):
+    def changeColors(self, override = False):
         if not override:
             if self.time == 0:
                 self.world.red, self.world.green, self.world.blue = self.intToRGB(self.sky[self.hour, 0])
