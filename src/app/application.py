@@ -1,6 +1,6 @@
-from gui import GUI
-from seasons import Cycles
-from creature import Creatures
+from src.app.gui.gui import GUI
+from src.app.seasons import Cycles
+from src.app.entities.creature import Creatures
 import math
 import time
 class App():

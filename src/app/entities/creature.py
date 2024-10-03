@@ -4,12 +4,16 @@ import pygame.gfxdraw
 import pygame.transform
 import math
 import time
-import pygame.sprite
 import pygame.mask
+import typing
 
-class Creatures(pygame.sprite.Group):
+import src.wrappers.pygame.sprite as sprite
+from src.wrappers.pygame.sprite import Group, Entity
+
+
+class Creatures(Group):
     def __init__(self, app):
-        super(Creatures, self).__init__()
+        super().__init__()
         self.app = app
         self.count = 50
         self.data = []
@@ -17,7 +21,7 @@ class Creatures(pygame.sprite.Group):
         self.lastMove = 0
         self.mag = 0
         self.mps = 0.05
-        self.sizeChanges = pygame.sprite.Group()
+        self.sizeChanges = Group()
         self.radiusBounds = [15, 45]
 
     def generate(self):
@@ -32,13 +36,13 @@ class Creatures(pygame.sprite.Group):
             self.add(newCreature)
 
             if newCreature.radius not in self.sizes:
-                self.sizes[newCreature.radius] = pygame.sprite.Group(newCreature)
+                self.sizes[newCreature.radius] = Group(newCreature)
             else:
                 self.sizes[newCreature.radius].add(newCreature)
 
             attempts = 0
-            while len(pygame.sprite.spritecollide(newCreature, self.sizes[newCreature.radius], False, collided = pygame.sprite.collide_circle)) > 1:
-                if newCreature in pygame.sprite.spritecollide(newCreature, self.sizes[newCreature.radius], False, collided = pygame.sprite.collide_circle):
+            while len(pygame.sprite.spritecollide(newCreature, self.sizes[newCreature.radius], False, collided = sprite.collide_circle)) > 1:
+                if newCreature in pygame.sprite.spritecollide(newCreature, self.sizes[newCreature.radius], False, collided = sprite.collide_circle):
                     newCreature.genLocation()
                     attempts += 1
                     if attempts >= 10:
@@ -81,8 +85,9 @@ class Creatures(pygame.sprite.Group):
         if len(self.sizeChanges):
             for creature in self.sizeChanges:
                 creature.kill()
+                self.add(creature)
                 if creature.radius not in self.sizes:
-                       self.sizes[creature.radius] = pygame.sprite.Group(creature)
+                       self.sizes[creature.radius] = Group(creature)
                 else:
                     self.sizes[creature.radius].add(creature)
             
@@ -94,7 +99,7 @@ class Creatures(pygame.sprite.Group):
         for creature in self.data:
             creature.genLocation()
 
-class Creature(pygame.sprite.Sprite):
+class Creature(Entity):
     def __init__(self, app, id, group) -> None:
         super(Creature, self).__init__(group)
         self.id = id
@@ -115,8 +120,7 @@ class Creature(pygame.sprite.Sprite):
         self.moveToStep = [0, 0]
         self.undulation = bool(random.randint(0, 1))
         self.undulationAmount = random.randint(92, 108) / 100
-        print(f'{self.undulationAmount=}')
-
+        
 
     def deriv(self, a, b):
         return {'dx': a[0] - b[0], 'dy': a[1] - b[1]}
