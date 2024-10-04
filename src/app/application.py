@@ -1,13 +1,12 @@
 from src.app.gui.gui import GUI
-from src.app.seasons import Cycles
-from src.app.entities.creature import Creatures
+from src.app.world.world import World
 import math
 import time
 class App():
     def __init__(self) -> None:
         self.gui = GUI(self)
-        self.cycles = None
-        self.creatures = Creatures(self)
+        self.world = World(self)
+        self.now = 0
         self.pnow = time.time()
         self.lastFrame = self.pnow
         self.frameRate = 0
@@ -17,12 +16,9 @@ class App():
 
     def run(self) -> None:
         self.gui.initPygame()
-        self.cycles = Cycles(self.gui.window.children["field"])
-        self.creatures.generate()
-
+        self.world.initWorld()
 
         self._running = True
-        
 
         while self._running:
             self.clockFrame()
@@ -46,7 +42,7 @@ class App():
     def loop(self):
         self.gui.processEvents()
         self.gui.processInputs()
-        self.creatures.update()
+        self.world.update()
 
 
     def running(self):
@@ -56,6 +52,7 @@ class App():
             self.lastFrameTime = time.time()
             
             self.gui.render()
+            self.world.tick()
 
     def onExit(self) -> None:
         self.gui.close()
@@ -64,4 +61,4 @@ class App():
         self._running = False
 
     def repositionCreatures(self):
-        self.creatures.genLocation()
+        self.world.data.creatures.genLocation()

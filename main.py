@@ -52,7 +52,7 @@ def processCommand(app, args):
                 print('\n')
 
                 return False
-                
+            
             elif currentArgument in ("-d", "--Display"):
                 app.gui.window.width, app.gui.window.height = currentValue.split(",")
             elif currentArgument in ("-p", "--PygameOptions"):

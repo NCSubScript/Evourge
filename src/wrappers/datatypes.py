@@ -21,7 +21,7 @@ class Dict(dict):
     def toJSON(self):
         return json.dumps(
         self,
-        default=lambda o: {o.data}, 
+        default=lambda o: {o}, 
         sort_keys=True,
         indent=4)
 
@@ -34,14 +34,14 @@ class Dict(dict):
     def change(self, object):
         if isinstance(object, dict):
             for k, v in object.items():
-                if k in self.data.keys():
+                if k in self.keys():
                     self['previous'][k] = self[k]
                 self[k] = v
                 
     def change(self, name, value):
         if name in self.keys():
             self['previous'][name] = self[name]
-        self.data[name] = value
+        self[name] = value
 
     def __getattr__(self, name: str):
         if name in self.keys():

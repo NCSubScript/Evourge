@@ -8,7 +8,8 @@ import pygame.mask
 import typing
 
 import src.wrappers.pygame.sprite as sprite
-from src.wrappers.pygame.sprite import Group, Entity
+from src.wrappers.pygame.sprite import Group, Entity, GroupSingle, MicroEntity
+
 
 
 class Creatures(Group):
@@ -111,8 +112,14 @@ class Creature(Entity):
         self.image = None
         self.mask = None
         self.rect = None
+
+        
         self.renderSprite()
         self.genLocation()
+
+        self.minimap = GroupSingle()
+        self.minimap.add(MicroEntity(self.minimap, self))
+
         self.lastMove = 0
         self.mps = 0.05
         self.location = list(self.rect.center).copy()
@@ -120,6 +127,8 @@ class Creature(Entity):
         self.moveToStep = [0, 0]
         self.undulation = bool(random.randint(0, 1))
         self.undulationAmount = random.randint(92, 108) / 100
+
+        self.app.gui.clickables.left.add(self)
         
 
     def deriv(self, a, b):
@@ -200,16 +209,16 @@ class Creature(Entity):
                                         alreadPoped = True
                                         break
                                     if not alreadPoped:
-                                        self.app.creatures.sizeChanges.add(self)
+                                        self.app.world.data.creatures.sizeChanges.add(self)
                                         self.radius += 1
                                         self.renderSprite()
                             if creature.radius > self.group.radiusBounds[0]:
                                 alreadPoped = False
-                                if creature in self.app.creatures.sizeChanges:
+                                if creature in self.app.world.data.creatures.sizeChanges:
                                     alreadPoped = True
                                     break
                                 if not alreadPoped:
-                                    self.app.creatures.sizeChanges.add(creature)
+                                    self.app.world.data.creatures.sizeChanges.add(creature)
                                     creature.radius -= 1
                                     creature.renderSprite()
                                     
@@ -227,14 +236,15 @@ class Creature(Entity):
         else:
             self.moveToStep[1] = -1 * self.moveToStep[1] 
             self.location[1] += self.moveToStep[1]
-        self.location[0] = min(self.app.gui.window.children["field"].width-(self.radius * 1), max(self.radius, (self.location[0])))
-        self.location[1] = min(self.app.gui.window.children["field"].height-(self.radius * 1), max(self.radius, (self.location[1])))
+        self.location[0] = min(self.app.world.width-(self.radius * 1), max(self.radius, (self.location[0])))
+        self.location[1] = min(self.app.world.height-(self.radius * 1), max(self.radius, (self.location[1])))
         
         self.rect.center = tuple(self.location.copy())
+
     def render(self, display):
         self.collusionResponse()
         self.updateLocation()
-                        
+                    
         size = display.get_size()
         cropped_background = pygame.Surface(size, pygame.SRCALPHA)
         pygame.draw.circle(cropped_background, (255,255,255), (self.location[0] + 2, self.location[1] + 2), self.radius * 0.7)
@@ -276,12 +286,13 @@ class Creature(Entity):
             
         
         
-        display.blit(scaled_background, ((self.location[0]-self.radius*1.3)-3, (self.location[1]-self.radius*1.3)-3))
+        display.blit(scaled_background, (((self.location[0]-self.radius*1.3)-3) - self.app.gui.window.children["field"].viewport.sprite.rect.left, ((self.location[1]-self.radius*1.3)-3) - self.app.gui.window.children["field"].viewport.sprite.rect.top))
       
-        display.blit(scaled_image, (math.floor(self.location[0]) - self.radius, math.floor(self.location[1]) - self.radius))
+        display.blit(scaled_image, ((math.floor(self.location[0]) - self.radius) - self.app.gui.window.children["field"].viewport.sprite.rect.left, (math.floor(self.location[1]) - self.radius) - self.app.gui.window.children["field"].viewport.sprite.rect.top))
+
     def genLocation(self):
-        w = self.app.gui.window.children["field"].width
-        h = self.app.gui.window.children["field"].height
+        w = self.app.world.width
+        h = self.app.world.height
         self.rect.center = (random.randint(int(self.radius), int(w-self.radius)), \
                          random.randint(int(self.radius), int(h-self.radius)))
     
@@ -291,8 +302,8 @@ class Creature(Entity):
                 self.mag = math.floor(self.app.gui.fps / self.mps)
                 self.moveTo[0] = math.floor(self.location[0]) + random.randint(-1 * self.mag, self.mag)
                 self.moveTo[1] = math.floor(self.location[1]) + random.randint(-1 * self.mag, self.mag)
-                self.moveTo[0] = min(self.app.gui.window.children["field"].width-(self.radius * 1), max(self.radius, (self.moveTo[0])))
-                self.moveTo[1] = min(self.app.gui.window.children["field"].height-(self.radius * 1), max(self.radius, (self.moveTo[1])))
+                self.moveTo[0] = min(self.app.world.width-(self.radius * 1), max(self.radius, (self.moveTo[0])))
+                self.moveTo[1] = min(self.app.world.height-(self.radius * 1), max(self.radius, (self.moveTo[1])))
 
                 self.moveToStep[0] = (self.location[0] - self.moveTo[0]) / (self.mag / 2)
                 self.moveToStep[1] = (self.location[1] - self.moveTo[1]) / (self.mag / 2)
@@ -300,3 +311,7 @@ class Creature(Entity):
 
         else:
             self.moveToStep = moveStep
+
+    def processLeftClick(self, pos):
+        self.app.gui.window.children["field"].viewport.sprite.rect.center = self.rect.center.copy()
+        self.app.gui.window.children["field"].viewport.sprite.setSize()
