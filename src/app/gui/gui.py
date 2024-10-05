@@ -1,12 +1,12 @@
 import pygame
 import random
 import math
-from src.wrappers.pygame.sprite import Group
-from src.wrappers.datatypes import Dict
+from src.wrappers.pygame.Sprite import Group
+from src.wrappers.Datatypes import Dict
 
-from src.locals import *
+from src.LOCALS import *
 
-from src.app.gui.window import Window
+from src.app.gui.Window import Window
 
 class GUI():
     def __init__(self, app) -> None:
@@ -89,6 +89,10 @@ class GUI():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.app.sigKill()
+            if event.key == pygame.K_m:
+                self.window.children["minimap"].visible = False if self.window.children["minimap"].visible else True
+            if event.key == pygame.K_p:
+                self.app.world.paused = False if self.app.world.paused else True
             
 
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -102,8 +106,9 @@ class GUI():
                 self.processScrollDown(event.pos)
 
     def processLeftClick(self, pos):
+        viewport = self.window.children["field"].viewport
         for item in self.clickables.left:
-            if item.rect.collidepoint(pos[0], pos[1]):
+            if item.rect.collidepoint(pos[0], pos[1]) or item.rect.collidepoint((pos[0] * viewport.sprite.zoom) + viewport.sprite.rect.left, (pos[1] * viewport.sprite.zoom) + viewport.sprite.rect.top):
                 item.processLeftClick(pos)
 
     def processRightClick(self, pos):

@@ -1,5 +1,5 @@
 from pygame import Rect as pygRect
-from src.wrappers.datatypes import *
+from src.wrappers.Datatypes import *
 
 class Rect(pygRect):
     

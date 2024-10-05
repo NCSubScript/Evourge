@@ -7,15 +7,15 @@ import time
 import pygame.mask
 import typing
 
-import src.wrappers.pygame.sprite as sprite
-from src.wrappers.pygame.sprite import Group, Entity, GroupSingle, MicroEntity
+import src.wrappers.pygame.Sprite as sprite
+from src.wrappers.pygame.Sprite import Group, Entity, GroupSingle, MicroEntity
 
 
 
 class Creatures(Group):
     def __init__(self, app):
-        super().__init__()
         self.app = app
+        super().__init__()
         self.count = 50
         self.data = []
         self.sizes = {}
@@ -26,7 +26,7 @@ class Creatures(Group):
         self.radiusBounds = [15, 45]
 
     def generate(self):
-        self.count = int(math.sqrt((self.app.gui.window.children["field"].width * self.app.gui.window.children["field"].width)) / 8)
+        self.count = int(math.sqrt((self.app.world.width *self.app.world.width)) / 128)
         self.empty()
         self.sizes = {}
         self.sizeChanges.empty()
@@ -62,8 +62,8 @@ class Creatures(Group):
     def update(self, collective = True):
         for size in self.sizes:
             self.mag = math.floor(self.app.gui.fps / self.mps)
-            moveX = random.randint(-1 * self.mag, self.mag)
-            moveY = random.randint(-1 * self.mag, self.mag)
+            moveX = random.randint(-1 * self.mag + 10000, self.mag+ 10000)
+            moveY = random.randint(-1 * self.mag+ 10000, self.mag+ 10000)
 
             for creature in self.sizes[size]:
                 if collective == True:
@@ -71,13 +71,13 @@ class Creatures(Group):
                         creature.mag = self.mag
                         creature.moveTo[0] = math.floor(creature.location[0]) + moveX
                         creature.moveTo[1] = math.floor(creature.location[1]) + moveY
-                        creature.moveTo[0] = min(self.app.gui.window.children["field"].width-(creature.radius), max(creature.radius, (creature.moveTo[0])))
-                        creature.moveTo[1] = min(self.app.gui.window.children["field"].height-(creature.radius), max(creature.radius, (creature.moveTo[1])))
+                        creature.moveTo[0] = min(self.app.world.width-(creature.radius), max(creature.radius, (creature.moveTo[0])))
+                        creature.moveTo[1] = min(self.app.world.height-(creature.radius), max(creature.radius, (creature.moveTo[1])))
 
                         creature.moveToStep[0] = (creature.location[0] - creature.moveTo[0]) / (self.mag / 2)
                         creature.moveToStep[1] = (creature.location[1] - creature.moveTo[1]) / (self.mag / 2)
                         creature.lastMove = time.time()
-                       
+
                 else:
                     creature.move()
                 
@@ -102,9 +102,9 @@ class Creatures(Group):
 
 class Creature(Entity):
     def __init__(self, app, id, group) -> None:
+        self.app = app
         super(Creature, self).__init__(group)
         self.id = id
-        self.app = app
         self.group = group
         self.color = [random.randint(20, 50), random.randint(100, 150), random.randint(150, 200)]
         self.sizeLimits = self.group.radiusBounds
@@ -226,24 +226,29 @@ class Creature(Entity):
                             deflected = True
                                 
     def updateLocation(self):
-        if (self.moveToStep[0] > 0 and self.location[0] + self.moveToStep[0] < self.app.gui.window.children["field"].width - self.radius) or (self.moveToStep[0] < 0 and self.location[0] + self.moveToStep[0] >= self.radius):
+        if (self.moveToStep[0] > 0 and self.location[0] + self.moveToStep[0] < self.app.world.width - self.radius) or (self.moveToStep[0] < 0 and self.location[0] + self.moveToStep[0] >= self.radius):
             self.location[0] += self.moveToStep[0]
         else:
             self.moveToStep[0] = -1 * self.moveToStep[0]
             self.location[0] += self.moveToStep[0]
-        if (self.moveToStep[1] > 0 and self.location[1] + self.moveToStep[1] < self.app.gui.window.children["field"].height - self.radius) or (self.moveToStep[1] < 0 and self.location[1] + self.moveToStep[1] >= self.radius):
+        if (self.moveToStep[1] > 0 and self.location[1] + self.moveToStep[1] < self.app.world.height - self.radius) or (self.moveToStep[1] < 0 and self.location[1] + self.moveToStep[1] >= self.radius):
             self.location[1] += self.moveToStep[1]
         else:
             self.moveToStep[1] = -1 * self.moveToStep[1] 
             self.location[1] += self.moveToStep[1]
         self.location[0] = min(self.app.world.width-(self.radius * 1), max(self.radius, (self.location[0])))
         self.location[1] = min(self.app.world.height-(self.radius * 1), max(self.radius, (self.location[1])))
+
+
         
         self.rect.center = tuple(self.location.copy())
+        self.minimap.sprite.rect.update(tuple(self.location.copy()), (1,1))
+
 
     def render(self, display):
-        self.collusionResponse()
-        self.updateLocation()
+        if not self.app.world.paused:
+            self.collusionResponse()
+            self.updateLocation()
                     
         size = display.get_size()
         cropped_background = pygame.Surface(size, pygame.SRCALPHA)
@@ -313,5 +318,6 @@ class Creature(Entity):
             self.moveToStep = moveStep
 
     def processLeftClick(self, pos):
-        self.app.gui.window.children["field"].viewport.sprite.rect.center = self.rect.center.copy()
+        self.app.gui.window.children["field"].viewport.sprite.following = self
+        self.app.gui.window.children["field"].viewport.sprite.rect.center = self.rect.center
         self.app.gui.window.children["field"].viewport.sprite.setSize()

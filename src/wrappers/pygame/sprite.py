@@ -1,16 +1,17 @@
 from pygame.sprite import Sprite as pygSprite, Group as pygGroup, GroupSingle as pgGroupSingle
 from pygame.sprite import *
 from pygame.constants import HIDDEN
-from src.wrappers.pygame.rect import Rect
-from src.wrappers.pygame.surface import Surface
-from src.wrappers.datatypes import *
+from src.wrappers.pygame.Rect import Rect
+from src.wrappers.pygame.Surface import Surface
+from src.wrappers.Datatypes import *
 
     
-class Entity(pygSprite):
+class Entity(pygSprite, DictAccess):
     def __init__(self, group, data = None):
-        super().__init__(group)
+        pygSprite.__init__(self, group)
         self.group = group
-        self.data = Dict(data)
+
+        DictAccess.__init__(self, data)
 
     def processLeftClick(self, pos):
         self.group.processLeftClick(pos)
@@ -18,27 +19,41 @@ class Entity(pygSprite):
     def processRightClick(self, pos):
         self.group.processRightClick(pos)
 
+
 class MicroEntity(Entity):
     def __init__(self, group, entity, data = None):
-        super().__init__(group)
+
+        super().__init__(group, data)
         
+
+        self.parent = entity
         self.rect = Rect(entity.rect.left, entity.rect.top, 1, 1)
         self.rect.center = entity.rect.center
-        self.color = entity.color
+        if group.color is not None:
+            self.color = group.color
+        else:
+            self.color = entity.color
         self.surface = Surface((2, 2), HIDDEN, 24)
-        self.surface.fill(self.color)
+        self.surface.fill(tuple(self.color))
 
     def render(self, surface, scale):
+        if self.parent not in self.parent.app.world.visableObjects:
+            self.parent.updateLocation()
         surface.blit(self.surface, (int(self.rect.left * scale), int(self.rect.top * scale)))
 
-class Group(pygGroup):
-    def __init__(self, group = None, data = None):
-        if group is not None:
-            super().__init__(group)
+class Group(pygGroup, DictAccess):
+    def __init__(self, sprites = None, data = None):
+
+        if sprites is not None:
+            pygGroup.__init__(self, sprites)
         else:
-            super().__init__()
+            pygGroup.__init__(self)
         
-        self.data = Dict(data)
+        DictAccess.__init__(self, data)
+        
+
+        
+        # self.data = Dict(data)
 
     def drawMicro(self, surface, scale):
         for sprite in self:
@@ -51,10 +66,15 @@ class Group(pygGroup):
             for sprite in self.sprites():
                 sprite.render(surface)
 
-class GroupSingle(pgGroupSingle):
+class GroupSingle(pgGroupSingle, DictAccess):
     def __init__(self, sprite = None, data = None):
-        super().__init__(sprite)
+        pgGroupSingle.__init__(self, sprite)
 
-        self.data = Dict(data)
+        DictAccess.__init__(self, data)
+
+
+
+        # self.data = Dict(data)
+
 
     

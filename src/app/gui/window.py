@@ -1,6 +1,6 @@
 
 from pygame.constants import HWSURFACE, DOUBLEBUF, RESIZABLE, SCALED
-from src.app.gui.sections.field import Field, Minimap
+from src.app.gui.window.Field import Field, Minimap
 
 class Window():
     def __init__(self, app) -> None:
@@ -17,7 +17,7 @@ class Window():
 
     def init(self):
         self.children["field"] = Field(self.app)
-        self.children["Minimap"] = Minimap(self.app)
+        self.children["minimap"] = Minimap(self.app)
 
 
     def getSize(self, scaled = True):

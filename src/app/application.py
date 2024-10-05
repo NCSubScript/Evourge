@@ -1,8 +1,8 @@
 from src.app.gui.gui import GUI
-from src.app.world.world import World
+from src.app.world.World import World
 import math
 import time
-class App():
+class Application():
     def __init__(self) -> None:
         self.gui = GUI(self)
         self.world = World(self)

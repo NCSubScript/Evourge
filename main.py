@@ -1,4 +1,4 @@
-from src.app.application import App
+from src.app.Application import Application as App
 import getopt, sys
 
 APPLICATION_NAME = "Evourge"

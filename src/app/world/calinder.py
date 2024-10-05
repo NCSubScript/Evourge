@@ -1,5 +1,5 @@
-from src.wrappers.datatypes import Dict
-from src.app.world.seasons import Cycles
+from src.wrappers.Datatypes import Dict
+from src.app.world.Seasons import Cycles
 
 class Calendar:
     def __init__(self, data = None):

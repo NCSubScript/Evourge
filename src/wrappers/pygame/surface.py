@@ -1,7 +1,7 @@
 from pygame import Surface as pygSurface
-import src.wrappers.pygame.draw as Draw
-import src.wrappers.pygame.transform as Transform
-from src.wrappers.datatypes import *
+import src.wrappers.pygame.Draw as Draw
+import src.wrappers.pygame.Transform as Transform
+from src.wrappers.Datatypes import *
 
 transform = Transform.pgTransform
 draw = Draw.pgDraw
