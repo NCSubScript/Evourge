@@ -26,7 +26,7 @@ class Creatures(Group):
         self.radiusBounds = [15, 45]
 
     def generate(self):
-        self.count = int(math.sqrt((self.app.world.width *self.app.world.width)) / 128)
+        self.count = 1 # int(math.sqrt((self.app.world.width *self.app.world.width)) / 128)
         self.empty()
         self.sizes = {}
         self.sizeChanges.empty()

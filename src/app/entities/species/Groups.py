@@ -13,7 +13,11 @@ class Plant(Groups):
     def __init__(self, app, parent=None, sprites=None, data=None):
         super().__init__(app, parent, sprites, data)
 
+        self.zoneSize = 30000
+
 
 class Animal(Groups):
     def __init__(self, app, parent=None, sprites=None, data=None):
         super().__init__(app, parent, sprites, data)
+
+        self.zoneSize = 2000

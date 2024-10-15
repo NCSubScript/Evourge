@@ -1,11 +1,11 @@
 
-from pygame.constants import HWSURFACE, DOUBLEBUF, RESIZABLE, SCALED
+from pygame.constants import HWSURFACE, DOUBLEBUF, RESIZABLE, SCALED, SRCALPHA
 from src.app.gui.window.Field import Field, Minimap
 
 class Window():
     def __init__(self, app) -> None:
         self.app = app
-        self.surfaceOptions = HWSURFACE|DOUBLEBUF|RESIZABLE
+        self.surfaceOptions = HWSURFACE|DOUBLEBUF|RESIZABLE|SRCALPHA
         self.externalWidth = 640
         self.externalHeight = 480
         self.width = 640

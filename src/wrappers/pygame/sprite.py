@@ -1,6 +1,6 @@
 from pygame.sprite import Sprite as pygSprite, Group as pygGroup, GroupSingle as pgGroupSingle
 from pygame.sprite import *
-from pygame.constants import HIDDEN
+from pygame.constants import HIDDEN, SRCALPHA
 from src.wrappers.pygame.Rect import Rect
 from src.wrappers.pygame.Surface import Surface
 from src.wrappers.Datatypes import *
@@ -10,6 +10,7 @@ class Entity(pygSprite, DictAccess):
     def __init__(self, group, data = None):
         pygSprite.__init__(self, group)
         self.group = group
+        self.minimapSize = 2
 
         DictAccess.__init__(self, data)
 
@@ -33,7 +34,7 @@ class MicroEntity(Entity):
             self.color = group.color
         else:
             self.color = entity.color
-        self.surface = Surface((2, 2), HIDDEN, 24)
+        self.surface = Surface((entity.minimapSize, entity.minimapSize), HIDDEN|SRCALPHA, 32)
         self.surface.fill(tuple(self.color))
 
     def render(self, surface, scale):

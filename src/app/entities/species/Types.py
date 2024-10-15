@@ -11,10 +11,14 @@ class Types(Entity):
 class Plant(Types):
 
     def __init__(self, app, group, parent=None, data=None):
+        self.minimapSize = 2
         super().__init__(app, group, parent, data)
+        
 
 
 class Animal(Types):
 
     def __init__(self, app, group, parent=None, data=None):
+        self.minimapSize = 8
         super().__init__(app, group, parent, data)
+        

@@ -3,7 +3,7 @@ import copy
 import random
 
 class Genetics(Dict):
-    def __init__(self, parent, neuralShape=(8, 10, 10, 4), clone=None, data=None):
+    def __init__(self, parent, clone=None, data=None):
         self.parent = parent
         super().__init__(data)
 
@@ -11,8 +11,8 @@ class Genetics(Dict):
 
         if data is None:
             self.dna = Dict()
-            self.nerualShape = Dict({"inputs": neuralShape[0], "neurons": neuralShape[1], "layers": neuralShape[2], "outputs": neuralShape[3]})
-            self.neurslShape.totalWeights = (self.nerualShape.inputs * self.nerualShape.neurons) + (self.nerualShape.neurons ** self.nerualShape.layers) + (self.nerualShape.neurons * self.nerualShape.outputs)
+            self.nerualShape = parent.traits.neurons
+            
 
             if clone is None:
                 self.dna = Dict()
@@ -25,5 +25,10 @@ class Genetics(Dict):
             self.dna = Dict(self.dna)
             self.neurslShape = Dict(self.nerualShape)
 
-    def getRandomColor(self):
-        return tuple(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+    
+
+    def getRandomColor(self, min=0, max=255):
+        return tuple(self.getRandomShade(min, max), self.getRandomShade(min, max), self.getRandomShade(min, max))
+    
+    def getRandomShade(self, min=0, max=255):
+        return random.randint(0, 255)

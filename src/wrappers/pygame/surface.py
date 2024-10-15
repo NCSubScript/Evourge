@@ -14,7 +14,7 @@ class Surface(pygSurface):
             super().__init__(area, flags, surface)
         self.data = Dict(data)
 
-    def __init__(self, area = (0, 0), flags=0, depth=0, masks=None, data=None):
+    def __init__(self, area = (0, 0), flags=0, depth=24, masks=None, data=None):
         if masks is None:
             super().__init__(area, flags, depth)
         else:

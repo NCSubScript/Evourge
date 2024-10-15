@@ -1,5 +1,6 @@
 from src.wrappers.Datatypes import Dict
 from src.wrappers.pygame.Sprite import Group
+from src.wrappers.pygame.Rect import Rect
 from src.app.world.Calinder import Calendar
 from src.app.entities.Creature import Creatures
 from src.app.entities.Species import Species
@@ -16,7 +17,7 @@ class World():
         self.allObjects = Group()
         self.visableObjects = Group()
         self.reservedColors = {}
-
+        self.rect = Rect(0, 0, self.width, self.height)
         self.paused = False
 
 
@@ -25,12 +26,35 @@ class World():
         self.data.creatures.generate()
 
         
-        
-        species = Species(self.app, "Plantae", self)
-        species.generateChild()
-        if species.kindom not in self.data.objects.keys():
-           self.data.objects[species.kingdom] = Dict()
-        self.data.objects[species.kingdom].add(species.name, species)
+
+
+        loadintUpdate = self.app.gui.renderLoading(f"Generateing Kingdom Plantae", 0, 0, (63, 122, 43))
+
+        for s in range(10):
+            loadintUpdate = 0
+            species = Species(self.app, "Plantae", self)
+            
+            if species.kingdom not in self.data.objects.keys():
+                self.data.objects[species.kingdom] = Dict()
+
+            for i in range(species.startingPopulationSize):
+                    loadintUpdate = self.app.gui.renderLoading(f"Generateing Species: {species.kingdom.capitalize()} {species.genus.capitalize()} {species.species.capitalize()}", i / (species.startingPopulationSize-1), loadintUpdate, species.color)
+                    species.generateChild()
+                    self.data.objects[species.kingdom].add(species.name, species)
+
+        loadintUpdate = self.app.gui.renderLoading(f"Generateing Kingdom Animalia", 0, 0, (122, 63, 43))
+
+        for s in range(10):
+            loadintUpdate = 0
+            species = Species(self.app, "Animalia", self)
+            
+            if species.kingdom not in self.data.objects.keys():
+                self.data.objects[species.kingdom] = Dict()
+
+            for i in range(species.startingPopulationSize):
+                    loadintUpdate = self.app.gui.renderLoading(f"Generateing Species: {species.kingdom.capitalize()} {species.genus.capitalize()} {species.species.capitalize()}", i / (species.startingPopulationSize-1), loadintUpdate, species.color)
+                    species.generateChild()
+                    self.data.objects[species.kingdom].add(species.name, species)
 
         self.gatherAllSprites()
 

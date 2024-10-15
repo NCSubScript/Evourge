@@ -1,4 +1,5 @@
 import typing
+from collections.abc import Iterator
 
 class DictAccess():
     
@@ -73,6 +74,10 @@ class Dict(dict):
         else:
             self['previous'][name] = None
         self[name] = value
+
+    def __iter__(self) -> typing.Iterator:
+        keys = super().__iter__()
+        return Iterator({x: keys[x] for x in keys if x != "previous"})
 
 
     def __str__(self):

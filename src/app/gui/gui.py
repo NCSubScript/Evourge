@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+import time
 from src.wrappers.pygame.Sprite import Group
 from src.wrappers.Datatypes import Dict
 
@@ -49,6 +50,7 @@ class GUI():
         
         pygame.display.init()
         pygame.font.init()
+        self.fonts = pygame.font.get_fonts()
         self.window.init()
         self.updateDisplay()
         
@@ -132,3 +134,36 @@ class GUI():
         self.window.render(self.display)
         pygame.display.flip()
         # pygame.time.Clock().tick(self.fps)
+
+    def renderLoading(self, label, percentage, lastUpdate, color=(128, 172, 245)):
+        self.app.now = time.time()
+        if self.app.now  >= lastUpdate + ((60 / (self.fps) / 60) / 4):
+            for event in pygame.event.get():
+                self.onLodatingEvent(event)
+            font = pygame.font.SysFont("impact", 24, bold=False, italic=False)
+            self.display.fill((0, 0, 0, 0))
+
+            text = font.render(f'{label}', True, color)
+            textSize = font.size(f'{label}')
+            center = (self.window.width / 2, self.window.height / 2)
+            self.display.blit(text, (center[0] - (textSize[0] / 2), center[1] - (textSize[1] * 2)))
+
+            if percentage:
+                pygame.draw.rect(self.display, color, (int(center[0] * 0.2), center[1] + (textSize[1]), int(center[0] * 1.6), 40), width=1, border_radius=5)
+                pygame.draw.rect(self.display, (int(color[0]/2), int(color[1]/2), int(color[2]/2)), (int(center[0] * 0.2) + 1, center[1] + int(textSize[1]) + 1, int((center[0] * 1.6) * percentage) - 2, 38), border_radius=5)
+
+            pygame.display.flip()
+            time.sleep(0.0025)
+
+            return self.app.now
+        return lastUpdate
+    
+    def onLodatingEvent(self, event):
+        if event.type == pygame.QUIT:
+            self.app.sigKill()
+        if event.type == pygame.WINDOWDISPLAYCHANGED:
+            self.screenId = int(event.display_index)
+        if event.type == pygame.VIDEORESIZE:
+            self.window.setSize(event.w, event.h)
+            self.updateDisplay()
+            self.app.repositionCreatures()

@@ -27,8 +27,8 @@ class VectorBound():
         return ValueError("Must set boundries before calling clamp")
 
 class Vector2(pgVector.Vector2, VectorBound):
-    def __init__(self) -> None:
-        return super().__init__()
+    def __init__(self, x) -> None:
+        return super().__init__(x)
 
 class Vector3(pgVector.Vector3, VectorBound):
     def __init__(self) -> None:

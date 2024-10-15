@@ -166,3 +166,11 @@ src/app/gui/__pycache__/gui.cpython-312.pyc
 src/app/__pycache__/application.cpython-312.pyc
 src/app/entities/__pycache__/creature.cpython-312.pyc
 src/wrappers/pygame/__pycache__/sprite.cpython-312.pyc
+video/rl-video-episode-0.mp4
+video/rl-video-episode-0.meta.json
+src/wrappers/pygame/__pycache__/sprite.cpython-312.pyc
+src/app/entities/__pycache__/creature.cpython-312.pyc
+src/app/gui/__pycache__/gui.cpython-312.pyc
+src/wrappers/__pycache__/datatypes.cpython-312.pyc
+src/wrappers/pygame/__pycache__/sprite.cpython-312.pyc
+*.pyc

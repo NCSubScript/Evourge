@@ -1,5 +1,7 @@
 from src.app.entities.life.Genetices import Genetics
 from src.app.entities.species.Types import *
+from src.wrappers.Datatypes import Dict
+
 import random
 
 class Life():
@@ -13,6 +15,9 @@ class Life():
             TypeError(f'Unknown type ({type})')
 
         object.parent = parent
+
+        object.traits = Dict()
+        
         
         return object
 
@@ -21,8 +26,18 @@ class Plants(Plant):
 
     def __init__(self, app, group, parent=None, data=None):
         super().__init__(app, group, parent, data)
+
+    def defineStartingTraits(self):
+        self.traits.colors = 8
+        self.traits.sensors = 4 #Neural Inputs
+        self.traits.actions = 4 #Neural Outputs
         
 class Animals(Animal):
 
     def __init__(self, app, group, parent=None, data=None):
         super().__init__(app, group, parent, data)
+
+    def defineStartingTraits(self):
+        self.traits.colors = 8
+        self.traits.sensors = 4 #Neural Inputs
+        self.traits.actions = 4 #Neural Outputs
