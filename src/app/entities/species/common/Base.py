@@ -31,8 +31,6 @@ class Entity(pygWrapperEntity, Helper):
     def __init__(self, app, group, parent=None, data=None):
         Helper.__init__(self, app, parent)
         
-
-        
         if data == None:
             pygWrapperEntity.__init__(self, group, data)    
             self.data.baseDNALength = 0
@@ -42,6 +40,7 @@ class Entity(pygWrapperEntity, Helper):
             self.data.id = self.id
 
             self.data.rect = Rect((self.app.world.width / 2) - 25, (self.app.world.height / 2) - 25, 50,50)
+            
 
             self.randomizeLocation()
 
@@ -49,11 +48,23 @@ class Entity(pygWrapperEntity, Helper):
 
             self.image = Surface(self.rect.size)
             self.image.fill(self.color)
+            
+            
 
         else:
             pygWrapperEntity.__init__(self, group, data)
             if "mobility" in self.data.keys():
                 self.data.mobility = Motion(self.data.mobility)
+
+    def addHighlightColors(self):
+        self.data.rect2 = Rect((self.app.world.width / 2) - 21, (self.app.world.height / 2) - 21, 42,42)
+        self.data.rect3 = Rect((self.app.world.width / 2) - 14, (self.app.world.height / 2) - 40, 20,36)
+        self.image2 = Surface(self.rect2.size)
+        self.image2.fill(self.color2)
+        self.image3 = Surface(self.rect3.size)
+        self.image3.fill(self.color3)
+        self.image.blit(self.image2, (4, 4))
+        self.image.blit(self.image3, (15, 7))
 
     def randomizeLocation(self):
         zoneCenter = Vector2(self.parent.startingZone)

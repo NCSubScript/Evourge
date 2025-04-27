@@ -13,6 +13,7 @@ class Application():
         self.fdt = 0.0001
         self.maxFrameRate = 0
         self.lastFrameTime = self.pnow - self.gui.fps
+        self.devmode = False
 
     def run(self) -> None:
         self.gui.initPygame()

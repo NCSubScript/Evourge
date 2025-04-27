@@ -20,6 +20,12 @@ class Entity(pygSprite, DictAccess):
     def processRightClick(self, pos):
         self.group.processRightClick(pos)
 
+    def update(self):
+        if self.brain is not None: 
+            # Currently getting here, but the brain requires a refactor for allow recustive neuron connections based on previous value to function as memory and some initilization...
+            #self.brain.forward((2,1,3,4))
+            pass
+
 
 class MicroEntity(Entity):
     def __init__(self, group, entity, data = None):
@@ -66,6 +72,10 @@ class Group(pygGroup, DictAccess):
         else:
             for sprite in self.sprites():
                 sprite.render(surface)
+
+    def update(self):
+        for i in self:
+            i.update()
 
 class GroupSingle(pgGroupSingle, DictAccess):
     def __init__(self, sprite = None, data = None):

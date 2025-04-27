@@ -106,7 +106,8 @@ class Creature(Entity):
         super(Creature, self).__init__(group)
         self.id = id
         self.group = group
-        self.color = [random.randint(20, 50), random.randint(100, 150), random.randint(150, 200)]
+        # self.color = [random.randint(20, 50), random.randint(100, 150), random.randint(150, 200)]
+        self.color = [255,0,0]
         self.sizeLimits = self.group.radiusBounds
         self.radius = random.randint(self.sizeLimits[0], self.sizeLimits[1])
         self.image = None

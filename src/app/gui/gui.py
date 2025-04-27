@@ -153,7 +153,8 @@ class GUI():
                 pygame.draw.rect(self.display, (int(color[0]/2), int(color[1]/2), int(color[2]/2)), (int(center[0] * 0.2) + 1, center[1] + int(textSize[1]) + 1, int((center[0] * 1.6) * percentage) - 2, 38), border_radius=5)
 
             pygame.display.flip()
-            time.sleep(0.0025)
+            if self.app.devmode == False:
+                time.sleep(0.00025)
 
             return self.app.now
         return lastUpdate

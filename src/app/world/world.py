@@ -25,9 +25,6 @@ class World():
         self.data.calendar = Calendar()
         self.data.creatures.generate()
 
-        
-
-
         loadintUpdate = self.app.gui.renderLoading(f"Generateing Kingdom Plantae", 0, 0, (63, 122, 43))
 
         for s in range(10):
@@ -78,6 +75,8 @@ class World():
     def update(self):
         if not self.paused:
             self.data.creatures.update()
+            for i in self.allObjects:
+                i.update()
 
     def tick(self):
         if not self.paused:

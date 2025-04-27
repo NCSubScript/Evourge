@@ -46,6 +46,8 @@ def leakyrelu(z, A=tuple((0.05, 0))):
         return z
 
 class Neuron:
+    
+
     def __init__(self, brain=None, layer=None, weights=Dict({"layers": {}}), bias=0, activation=None, activation_strength=None):
         self.brain = brain
         self.layer = layer
@@ -62,41 +64,41 @@ class Neuron:
         self._activated_at = 0
 
 
-        def fire(self, value=None):
-            self._fired_at = time.time()
+    def fire(self, value=None):
+        self._fired_at = time.time()
 
-            if value is None:
-                self.previous_value = self.value
-                self.previous_activated_value = self.activated_value
-                self.value = 0
-                for l in self.weights.layers:
-                    for lidx, neuron in l.items():
-                        if lidx < self.layer:
-                            self.value += self.brain.layer[lidx][neuron.key()].getValue() * neuron.value()
-                        else:
-                            self.value += self.brain.layer[lidx][neuron.key()].getPreviousValue() * neuron.value()
-
-                self.value *= self.bias
-            else:
-                self.previous_value = self.value
-                self.previous_activated_value = self.activated_value
-                self.value = value
-            
-
-        def getValue(self, raw=False):
-            if self.activation is None or raw is True:
-                self._activated_at = time.time()
-                return self.value
-            else:
-                if self._fired_at > self._activated_at:
-                    if self.activation_strength is None:
-                        self.activated_value = self.actvation(self.value)
+        if value is None:
+            self.previous_value = self.value
+            self.previous_activated_value = self.activated_value
+            self.value = 0
+            for l in self.weights.layers:
+                for lidx, neuron in l.items():
+                    if lidx < self.layer:
+                        self.value += self.brain.layer[lidx][neuron.key()].getValue() * neuron.value()
                     else:
-                        self.activated_value = self.actvation(self.value, self.activation_strength)
-                    self._activated_at = time.time()
-            return self.activated_value 
-                
-        def getPreviousValue(self, raw=False):
-            if self.activation is None or raw is True:
-                return self.previous_value
-            return self.previous_activated_value
+                        self.value += self.brain.layer[lidx][neuron.key()].getPreviousValue() * neuron.value()
+
+            self.value *= self.bias
+        else:
+            self.previous_value = self.value
+            self.previous_activated_value = self.activated_value
+            self.value = value
+        
+
+    def getValue(self, raw=False):
+        if self.activation is None or raw is True:
+            self._activated_at = time.time()
+            return self.value
+        else:
+            if self._fired_at > self._activated_at:
+                if self.activation_strength is None:
+                    self.activated_value = self.actvation(self.value)
+                else:
+                    self.activated_value = self.actvation(self.value, self.activation_strength)
+                self._activated_at = time.time()
+        return self.activated_value 
+            
+    def getPreviousValue(self, raw=False):
+        if self.activation is None or raw is True:
+            return self.previous_value
+        return self.previous_activated_value

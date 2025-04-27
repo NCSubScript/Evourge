@@ -1,4 +1,7 @@
 from src.app.entities.species.Groups import *
+from .life.Genetices import Genetics
+from .life.neural.Brain import Brain
+
 
 import random
 
@@ -12,8 +15,10 @@ class Species():
         else:
             TypeError(f'Unknown type ({type})')
 
+        object.sampleDNA = Genetics.generateStartingGnome(app, {0:Brain.INPUT_NEURONS, 1:Brain.OUTPUT_NEURONS})
+
         if data is None:
-            object.data.color = [random.randint(128, 255), random.randint(128, 255), random.randint(128, 255)]
+            object.data.color = [Genetics.getGeneExpression(object.sampleDNA[0]), Genetics.getGeneExpression(object.sampleDNA[1]), Genetics.getGeneExpression(object.sampleDNA[2])]
             if type == "Plantae":
                 object.data.color.append(128)
             while object.data.color in app.world.reservedColors.values():
@@ -22,7 +27,6 @@ class Species():
             self.generateName(object)
             self.selectStartingZone(object, app.world.rect.size)
 
-            object.defineStartingTraits(object)
             
         return object
     
@@ -54,7 +58,6 @@ class Plants(Plant):
         self.kingdom = "Plantae"
         self.startingPopulationSize = 200
         super().__init__(app, parent, group, data)
-
     
         
 class Animals(Animal):
@@ -62,6 +65,7 @@ class Animals(Animal):
     def __init__(self, app, parent=None, group=None, data=None):
         self.kingdom = "Animalia"
         self.startingPopulationSize = 10
+        self.mobility = True
         super().__init__(app, parent, group, data)
 
     

@@ -4,7 +4,7 @@ import src.wrappers.pygame.Transform as Transform
 from src.wrappers.Datatypes import *
 
 transform = Transform.pgTransform
-draw = Draw.pgDraw
+draw = Draw.pygDraw
 
 class Surface(pygSurface):
     def __init__(self, area, flags=0, surface=None, data=None):
